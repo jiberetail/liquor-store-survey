@@ -42,12 +42,10 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 .outline-button { color: var(--cream); background: transparent; }
 
 header { height: 220px; padding: 58px 72px 0; display: flex; justify-content: space-between; align-items: flex-start; position: relative; z-index: 5; }
-.progress { width: 315px; padding-top: 15px; }
-.progress > span { color: var(--gold-light); font-size: 11px; letter-spacing: .23em; }
-.progress div { display: flex; gap: 7px; margin: 15px 0 9px; }
-.progress i { height: 3px; flex: 1; background: rgba(255,255,255,.16); }
-.progress i.active { background: var(--gold-light); }
-.progress small { color: #8f8374; font-size: 11px; letter-spacing: .18em; }
+.header-actions { display: flex; gap: 12px; padding-top: 11px; }
+.header-actions button { min-width: 138px; height: 68px; display: inline-flex; align-items: center; justify-content: center; gap: 12px; border: 1px solid rgba(201,163,93,.32); color: #d8cdbb; background: rgba(255,255,255,.025); text-transform: uppercase; letter-spacing: .15em; font-size: 11px; font-weight: 700; cursor: pointer; }
+.header-actions button:last-child { color: #17110a; border-color: var(--gold); background: linear-gradient(135deg, #e0c17e, #b3823f); }
+.header-actions span { font-size: 19px; line-height: 1; }
 
 .question { position: absolute; inset: 220px 0 88px; padding: 55px 84px; display: flex; flex-direction: column; animation: enter .35s ease both; }
 @keyframes enter { from { opacity: 0; transform: translateY(12px); } }

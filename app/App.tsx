@@ -111,16 +111,6 @@ function Brand() {
   );
 }
 
-function Progress({ current, total }: { current: number; total: number }) {
-  return (
-    <div className="progress">
-      <span>QUESTION {String(current).padStart(2, "0")}</span>
-      <div>{Array.from({ length: total }, (_, index) => <i key={index} className={index < current ? "active" : ""} />)}</div>
-      <small>{current} / {total}</small>
-    </div>
-  );
-}
-
 export default function App() {
   const [screen, setScreen] = useState<Screen>("splash");
   const [scale, setScale] = useState(1);
@@ -164,17 +154,6 @@ export default function App() {
   const selectedProduct = useMemo(() => categoryProducts.find((product) => product.id === productId) ?? (
     categoryKey ? fullCatalog[categoryKey].find((product) => product.id === productId) : undefined
   ), [categoryKey, categoryProducts, productId]);
-  const baseTotal = found === false ? 6 : 3;
-  const total = baseTotal + (associateHelped === true ? 1 : 0);
-  const step = screen === "found" ? 1
-    : screen === "category" ? 2
-    : screen === "type" ? 3
-    : screen === "products" ? 4
-    : screen === "rating" ? (found === false ? 5 : 2)
-    : screen === "associate" ? baseTotal
-    : screen === "associateRating" ? total
-    : 0;
-
   const reset = () => {
     setFound(null);
     setCategoryKey(null);
@@ -186,6 +165,20 @@ export default function App() {
     setAssociateHelped(null);
     setAssociateRating(null);
     setScreen("splash");
+  };
+
+  const goBack = () => {
+    const previous: Record<Exclude<Screen, "splash">, Screen> = {
+      found: "splash",
+      category: "found",
+      type: "category",
+      products: "type",
+      rating: found ? "found" : "products",
+      associate: "rating",
+      associateRating: "associate",
+      thanks: associateHelped ? "associateRating" : "associate",
+    };
+    if (screen !== "splash") setScreen(previous[screen]);
   };
 
   return (
@@ -206,7 +199,13 @@ export default function App() {
           </section>
         ) : (
           <>
-            <header><Brand />{step > 0 && <Progress current={step} total={total} />}</header>
+            <header>
+              <Brand />
+              <div className="header-actions" aria-label="Survey navigation">
+                <button onClick={goBack}><span>←</span> Back</button>
+                <button onClick={reset}><span>⌂</span> Home</button>
+              </div>
+            </header>
 
             {screen === "found" && (
               <section className="question">
