@@ -106,7 +106,7 @@ function Brand() {
   return (
     <div className="brand">
       <span>EST. 2026</span>
-      <strong>YOUR STORE</strong>
+      <strong>LIQUOR STORE</strong>
       <i />
       <em>Fine Wines &amp; Spirits</em>
     </div>
@@ -384,7 +384,7 @@ export default function App() {
               </section>
             )}
 
-            <footer><span>YOUR STORE · LOCATION PLACEHOLDER</span><span>PLEASE ENJOY RESPONSIBLY · 21+</span></footer>
+            <footer><span>LIQUOR STORE · LOCATION PLACEHOLDER</span><span>PLEASE ENJOY RESPONSIBLY · 21+</span></footer>
           </>
         )}
       </div>

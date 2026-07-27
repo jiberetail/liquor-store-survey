@@ -15,14 +15,14 @@ const sans = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Your Store | Guest Experience Survey",
+  title: "Liquor Store | Guest Experience Survey",
   description: "A premium kiosk survey for fine wine and spirits retailers.",
   icons: { icon: "/favicon.svg", shortcut: "/favicon.svg" },
   openGraph: {
     title: "Help us raise the bar.",
     description: "A 3-question guest experience survey.",
     type: "website",
-    images: [{ url: "/og.png", width: 1730, height: 909, alt: "Your Store guest experience survey" }],
+    images: [{ url: "/og.png", width: 1730, height: 909, alt: "Liquor Store guest experience survey" }],
   },
   twitter: {
     card: "summary_large_image",
