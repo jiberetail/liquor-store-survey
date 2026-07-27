@@ -193,10 +193,11 @@ export default function App() {
             <div className="splash-top"><Brand /><span className="age-mark">21+</span></div>
             <div className="splash-copy">
               <p>YOUR EXPERIENCE · YOUR SAY</p>
-              <h1>Help us<br />raise the bar.</h1>
+              <h1>HELP US<br />RAISE THE BAR.</h1>
               <span>Tell us about today’s visit in under a minute.</span>
+              <div className="survey-offer"><strong>5% OFF</strong><span>YOUR NEXT PURCHASE</span></div>
               <button className="gold-button" onClick={() => setScreen("found")}>I’M 21+ · BEGIN SURVEY <b>→</b></button>
-              <small>By entering, you confirm you are of legal drinking age.</small>
+              <small>Complete the survey to receive your offer. Restrictions may apply. By entering, you confirm you are of legal drinking age.</small>
             </div>
           </section>
         ) : (
