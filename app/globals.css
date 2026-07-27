@@ -25,8 +25,6 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 
 .splash { position: absolute; inset: 0; overflow: hidden; background: #000; }
 .splash video { width: 100%; height: 100%; object-fit: cover; }
-.bottle-replacement-backdrop { position: absolute; z-index: 1; left: 2%; top: 5%; width: 55%; height: 66%; background: radial-gradient(ellipse at 45% 44%, rgba(12,12,12,.98) 0 42%, rgba(12,12,12,.88) 57%, rgba(7,7,7,.28) 77%, transparent 100%); filter: blur(20px); pointer-events: none; }
-.blue-label-bottle { position: absolute; z-index: 2; left: 14.5%; top: 8%; width: 31%; height: 63%; object-fit: contain; filter: brightness(.72) contrast(1.12) saturate(.86) drop-shadow(0 24px 28px rgba(0,0,0,.72)); transform: rotate(-2deg); transform-origin: center; pointer-events: none; }
 .splash-shade { position: absolute; z-index: 2; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.14), rgba(0,0,0,.05) 38%, rgba(6,4,3,.92) 83%, #080605 100%), linear-gradient(90deg, rgba(0,0,0,.3), transparent 70%); }
 .splash-top { position: absolute; z-index: 4; top: 70px; left: 75px; right: 75px; display: flex; align-items: flex-start; justify-content: space-between; }
 .age-mark { width: 67px; height: 67px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.55); border-radius: 50%; color: white; font-size: 14px; font-weight: 700; }
