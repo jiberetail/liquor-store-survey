@@ -5,6 +5,8 @@ import catalogData from "./data/catalog.json";
 
 const KIOSK_WIDTH = 1080;
 const KIOSK_HEIGHT = 1920;
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+const assetUrl = (url: string) => url.startsWith("/") ? `${basePath}${url}` : url;
 
 type CategoryKey = "whiskey" | "tequila" | "vodka" | "gin" | "cognac" | "wine";
 type Screen = "splash" | "found" | "category" | "type" | "products" | "rating" | "associate" | "associateRating" | "thanks";
@@ -186,7 +188,7 @@ export default function App() {
       <div className="kiosk" style={{ width: KIOSK_WIDTH, height: KIOSK_HEIGHT, transform: `scale(${scale})`, transformOrigin: "top left", top: offset.y, left: offset.x }}>
         {screen === "splash" ? (
           <section className="splash">
-            <video src="/splash.mp4" autoPlay muted loop playsInline aria-label="Premium spirits introduction" />
+            <video src={assetUrl("/splash.mp4")} autoPlay muted loop playsInline aria-label="Premium spirits introduction" />
             <div className="splash-shade" />
             <div className="splash-top"><Brand /><span className="age-mark">21+</span></div>
             <div className="splash-copy">
@@ -236,7 +238,7 @@ export default function App() {
                 <div className="catalog-grid">
                   {categories.map((category) => (
                     <button key={category.key} className={categoryKey === category.key ? "catalog-card active" : "catalog-card"} onClick={() => { setCategoryKey(category.key); setTypeName(null); setProductId(null); setSearch(""); setVisibleCount(18); }}>
-                      <img src={category.image} alt={category.product} />
+                      <img src={assetUrl(category.image)} alt={category.product} />
                       <span className="card-shade" />
                       <small>FEATURED · {category.product}</small>
                       <strong>{category.name}</strong>
@@ -258,7 +260,7 @@ export default function App() {
                 <div className="catalog-grid">
                   {selectedCategory.types.map((item) => (
                     <button key={item.name} className={typeName === item.name ? "catalog-card active" : "catalog-card"} onClick={() => setTypeName(item.name)}>
-                      <img src={item.image} alt={item.product} />
+                      <img src={assetUrl(item.image)} alt={item.product} />
                       <span className="card-shade" />
                       <small>EXAMPLE · {item.product}</small>
                       <strong>{item.name}</strong>
@@ -289,7 +291,7 @@ export default function App() {
                   <div className="product-list-grid">
                     {categoryProducts.slice(0, visibleCount).map((product) => (
                       <button key={product.id} className={productId === product.id ? "product-tile active" : "product-tile"} onClick={() => setProductId(product.id)}>
-                        <span className="product-photo"><img src={product.image} alt={product.name} loading="lazy" /></span>
+                        <span className="product-photo"><img src={assetUrl(product.image)} alt={product.name} loading="lazy" /></span>
                         <small>{product.type || selectedCategory.name}</small>
                         <strong>{product.name}</strong>
                         <i>{productId === product.id ? "✓" : "+"}</i>
