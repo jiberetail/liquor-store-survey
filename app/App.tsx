@@ -1,14 +1,17 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import catalogData from "./data/catalog.json";
 
 const KIOSK_WIDTH = 1080;
 const KIOSK_HEIGHT = 1920;
 
 type CategoryKey = "whiskey" | "tequila" | "vodka" | "gin" | "cognac" | "wine";
-type Screen = "splash" | "found" | "category" | "type" | "rating" | "thanks";
+type Screen = "splash" | "found" | "category" | "type" | "products" | "rating" | "thanks";
 type Choice = { name: string; product: string; image: string };
 type Category = Choice & { key: CategoryKey; types: Choice[] };
+type CatalogProduct = { id: string; name: string; handle: string; type: string; tags: string[]; image: string; url: string };
+const fullCatalog = catalogData as Record<CategoryKey, CatalogProduct[]>;
 
 const categories: Category[] = [
   {
@@ -125,6 +128,9 @@ export default function App() {
   const [found, setFound] = useState<boolean | null>(null);
   const [categoryKey, setCategoryKey] = useState<CategoryKey | null>(null);
   const [typeName, setTypeName] = useState<string | null>(null);
+  const [productId, setProductId] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [visibleCount, setVisibleCount] = useState(18);
   const [rating, setRating] = useState<number | null>(null);
 
   useEffect(() => {
@@ -139,13 +145,33 @@ export default function App() {
   }, []);
 
   const selectedCategory = useMemo(() => categories.find((item) => item.key === categoryKey), [categoryKey]);
-  const total = found === false ? 4 : 2;
-  const step = screen === "found" ? 1 : screen === "category" ? 2 : screen === "type" ? 3 : screen === "rating" ? total : 0;
+  const categoryProducts = useMemo(() => {
+    if (!categoryKey) return [];
+    const query = search.trim().toLowerCase();
+    const typeWords = (typeName ?? "").toLowerCase().split(/\s+/).filter((word) => word.length > 3);
+    return fullCatalog[categoryKey]
+      .filter((product) => !query || `${product.name} ${product.type} ${product.tags.join(" ")}`.toLowerCase().includes(query))
+      .sort((a, b) => {
+        const aText = `${a.name} ${a.type} ${a.tags.join(" ")}`.toLowerCase();
+        const bText = `${b.name} ${b.type} ${b.tags.join(" ")}`.toLowerCase();
+        const aMatch = typeWords.some((word) => aText.includes(word)) ? 1 : 0;
+        const bMatch = typeWords.some((word) => bText.includes(word)) ? 1 : 0;
+        return bMatch - aMatch;
+      });
+  }, [categoryKey, search, typeName]);
+  const selectedProduct = useMemo(() => categoryProducts.find((product) => product.id === productId) ?? (
+    categoryKey ? fullCatalog[categoryKey].find((product) => product.id === productId) : undefined
+  ), [categoryKey, categoryProducts, productId]);
+  const total = found === false ? 5 : 2;
+  const step = screen === "found" ? 1 : screen === "category" ? 2 : screen === "type" ? 3 : screen === "products" ? 4 : screen === "rating" ? total : 0;
 
   const reset = () => {
     setFound(null);
     setCategoryKey(null);
     setTypeName(null);
+    setProductId(null);
+    setSearch("");
+    setVisibleCount(18);
     setRating(null);
     setScreen("splash");
   };
@@ -198,7 +224,7 @@ export default function App() {
                 </div>
                 <div className="catalog-grid">
                   {categories.map((category) => (
-                    <button key={category.key} className={categoryKey === category.key ? "catalog-card active" : "catalog-card"} onClick={() => { setCategoryKey(category.key); setTypeName(null); }}>
+                    <button key={category.key} className={categoryKey === category.key ? "catalog-card active" : "catalog-card"} onClick={() => { setCategoryKey(category.key); setTypeName(null); setProductId(null); setSearch(""); setVisibleCount(18); }}>
                       <img src={category.image} alt={category.product} />
                       <span className="card-shade" />
                       <small>FEATURED · {category.product}</small>
@@ -229,7 +255,43 @@ export default function App() {
                     </button>
                   ))}
                 </div>
-                <Nav back={() => setScreen("category")} next={() => setScreen("rating")} disabled={!typeName} />
+                <Nav back={() => setScreen("category")} next={() => setScreen("products")} disabled={!typeName} label="View products" />
+              </section>
+            )}
+
+            {screen === "products" && selectedCategory && (
+              <section className="question product-question">
+                <div className="question-copy compact product-heading">
+                  <p>{selectedCategory.name.toUpperCase()} · COMPLETE CATALOG</p>
+                  <h1>Which product were you looking for?</h1>
+                  <span>{categoryProducts.length.toLocaleString()} products available · {typeName} matches shown first</span>
+                </div>
+                <label className="catalog-search">
+                  <span>SEARCH CATALOG</span>
+                  <input
+                    value={search}
+                    onChange={(event) => { setSearch(event.target.value); setVisibleCount(18); }}
+                    placeholder={`Search all ${selectedCategory.name.toLowerCase()} products…`}
+                  />
+                </label>
+                <div className="product-list">
+                  <div className="product-list-grid">
+                    {categoryProducts.slice(0, visibleCount).map((product) => (
+                      <button key={product.id} className={productId === product.id ? "product-tile active" : "product-tile"} onClick={() => setProductId(product.id)}>
+                        <span className="product-photo"><img src={product.image} alt={product.name} loading="lazy" /></span>
+                        <small>{product.type || selectedCategory.name}</small>
+                        <strong>{product.name}</strong>
+                        <i>{productId === product.id ? "✓" : "+"}</i>
+                      </button>
+                    ))}
+                  </div>
+                  {visibleCount < categoryProducts.length && (
+                    <button className="load-more" onClick={() => setVisibleCount((count) => count + 18)}>
+                      SHOW 18 MORE · {categoryProducts.length - visibleCount} REMAINING
+                    </button>
+                  )}
+                </div>
+                <Nav back={() => setScreen("type")} next={() => setScreen("rating")} disabled={!productId} label="Select product" />
               </section>
             )}
 
@@ -247,7 +309,7 @@ export default function App() {
                     </button>
                   ))}
                 </div>
-                <Nav back={() => setScreen(found ? "found" : "type")} next={() => setScreen("thanks")} disabled={!rating} label="Submit feedback" />
+                <Nav back={() => setScreen(found ? "found" : "products")} next={() => setScreen("thanks")} disabled={!rating} label="Submit feedback" />
               </section>
             )}
 
@@ -258,7 +320,7 @@ export default function App() {
                 <h1>Thank you for helping us stock smarter.</h1>
                 <div className="summary">
                   <span>ITEM FOUND<strong>{found ? "Yes" : "No"}</strong></span>
-                  {!found && <span>REQUESTED<strong>{typeName} · {selectedCategory?.name}</strong></span>}
+                  {!found && <span>REQUESTED<strong>{selectedProduct?.name ?? `${typeName} · ${selectedCategory?.name}`}</strong></span>}
                   <span>EXPERIENCE<strong>{rating} / 5</strong></span>
                 </div>
                 <button className="outline-button" onClick={reset}>START ANOTHER SURVEY</button>
