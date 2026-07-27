@@ -114,6 +114,7 @@ nav .gold-button { width: 340px; }
 .seal { width: 120px; height: 120px; display: grid; place-items: center; margin-bottom: 42px; border: 1px solid var(--gold); border-radius: 50%; color: var(--gold-light); font-size: 40px; }
 .thanks h1 { max-width: 830px; font-size: 84px; line-height: .92; }
 .summary { width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: 70px; background: rgba(201,163,93,.25); border: 1px solid rgba(201,163,93,.25); }
+.summary.summary-four { grid-template-columns: repeat(4, 1fr); }
 .summary span { min-height: 130px; padding: 31px 15px; color: #9e9282; background: #100d0a; font-size: 10px; letter-spacing: .18em; }
 .summary strong { display: block; margin-top: 17px; color: var(--cream); font-family: var(--font-display); font-size: 23px; line-height: 1.1; letter-spacing: 0; }
 .thanks .outline-button { width: 390px; margin-top: 65px; }

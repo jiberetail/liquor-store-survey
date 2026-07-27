@@ -7,7 +7,7 @@ const KIOSK_WIDTH = 1080;
 const KIOSK_HEIGHT = 1920;
 
 type CategoryKey = "whiskey" | "tequila" | "vodka" | "gin" | "cognac" | "wine";
-type Screen = "splash" | "found" | "category" | "type" | "products" | "rating" | "thanks";
+type Screen = "splash" | "found" | "category" | "type" | "products" | "rating" | "associate" | "associateRating" | "thanks";
 type Choice = { name: string; product: string; image: string };
 type Category = Choice & { key: CategoryKey; types: Choice[] };
 type CatalogProduct = { id: string; name: string; handle: string; type: string; tags: string[]; image: string; url: string };
@@ -132,6 +132,8 @@ export default function App() {
   const [search, setSearch] = useState("");
   const [visibleCount, setVisibleCount] = useState(18);
   const [rating, setRating] = useState<number | null>(null);
+  const [associateHelped, setAssociateHelped] = useState<boolean | null>(null);
+  const [associateRating, setAssociateRating] = useState<number | null>(null);
 
   useEffect(() => {
     const resize = () => {
@@ -162,8 +164,16 @@ export default function App() {
   const selectedProduct = useMemo(() => categoryProducts.find((product) => product.id === productId) ?? (
     categoryKey ? fullCatalog[categoryKey].find((product) => product.id === productId) : undefined
   ), [categoryKey, categoryProducts, productId]);
-  const total = found === false ? 5 : 2;
-  const step = screen === "found" ? 1 : screen === "category" ? 2 : screen === "type" ? 3 : screen === "products" ? 4 : screen === "rating" ? total : 0;
+  const baseTotal = found === false ? 6 : 3;
+  const total = baseTotal + (associateHelped === true ? 1 : 0);
+  const step = screen === "found" ? 1
+    : screen === "category" ? 2
+    : screen === "type" ? 3
+    : screen === "products" ? 4
+    : screen === "rating" ? (found === false ? 5 : 2)
+    : screen === "associate" ? baseTotal
+    : screen === "associateRating" ? total
+    : 0;
 
   const reset = () => {
     setFound(null);
@@ -173,6 +183,8 @@ export default function App() {
     setSearch("");
     setVisibleCount(18);
     setRating(null);
+    setAssociateHelped(null);
+    setAssociateRating(null);
     setScreen("splash");
   };
 
@@ -298,7 +310,7 @@ export default function App() {
             {screen === "rating" && (
               <section className="question rating-question">
                 <div className="question-copy">
-                  <p>FINAL QUESTION</p>
+                  <p>OVERALL EXPERIENCE</p>
                   <h1>How was your overall shopping experience?</h1>
                   <span>Tap the rating that best reflects today’s visit.</span>
                 </div>
@@ -309,7 +321,49 @@ export default function App() {
                     </button>
                   ))}
                 </div>
-                <Nav back={() => setScreen(found ? "found" : "products")} next={() => setScreen("thanks")} disabled={!rating} label="Submit feedback" />
+                <Nav back={() => setScreen(found ? "found" : "products")} next={() => setScreen("associate")} disabled={!rating} />
+              </section>
+            )}
+
+            {screen === "associate" && (
+              <section className="question associate-question">
+                <div className="question-copy">
+                  <p>STORE SERVICE</p>
+                  <h1>Did a store associate assist you today?</h1>
+                  <span>This helps us understand how our team supported your visit.</span>
+                </div>
+                <div className="answer-pair">
+                  <button className={associateHelped === true ? "answer active" : "answer"} onClick={() => { setAssociateHelped(true); setAssociateRating(null); }}>
+                    <b>YES</b><strong>An associate helped me</strong><span>I received help during my visit.</span><i>→</i>
+                  </button>
+                  <button className={associateHelped === false ? "answer active" : "answer"} onClick={() => { setAssociateHelped(false); setAssociateRating(null); }}>
+                    <b>NO</b><strong>I shopped independently</strong><span>I did not receive associate assistance.</span><i>→</i>
+                  </button>
+                </div>
+                <Nav
+                  back={() => setScreen("rating")}
+                  next={() => setScreen(associateHelped ? "associateRating" : "thanks")}
+                  disabled={associateHelped === null}
+                  label={associateHelped ? "Rate associate" : "Submit feedback"}
+                />
+              </section>
+            )}
+
+            {screen === "associateRating" && (
+              <section className="question rating-question associate-rating-question">
+                <div className="question-copy">
+                  <p>ASSOCIATE EXPERIENCE</p>
+                  <h1>How would you rate the associate who helped you?</h1>
+                  <span>Consider their attentiveness, knowledge, and overall helpfulness.</span>
+                </div>
+                <div className="rating-grid">
+                  {[1, 2, 3, 4, 5].map((value) => (
+                    <button key={value} className={associateRating === value ? "rating active" : "rating"} onClick={() => setAssociateRating(value)}>
+                      <b>0{value}</b><span>{["Poor", "Fair", "Good", "Very good", "Excellent"][value - 1]}</span>
+                    </button>
+                  ))}
+                </div>
+                <Nav back={() => setScreen("associate")} next={() => setScreen("thanks")} disabled={!associateRating} label="Submit feedback" />
               </section>
             )}
 
@@ -318,10 +372,11 @@ export default function App() {
                 <span className="seal">✓</span>
                 <p>FEEDBACK RECEIVED</p>
                 <h1>Thank you for helping us stock smarter.</h1>
-                <div className="summary">
+                <div className={found ? "summary" : "summary summary-four"}>
                   <span>ITEM FOUND<strong>{found ? "Yes" : "No"}</strong></span>
                   {!found && <span>REQUESTED<strong>{selectedProduct?.name ?? `${typeName} · ${selectedCategory?.name}`}</strong></span>}
                   <span>EXPERIENCE<strong>{rating} / 5</strong></span>
+                  <span>ASSOCIATE<strong>{associateHelped ? `${associateRating} / 5` : "No assistance"}</strong></span>
                 </div>
                 <button className="outline-button" onClick={reset}>START ANOTHER SURVEY</button>
               </section>
