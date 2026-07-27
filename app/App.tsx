@@ -5,240 +5,279 @@ import { useEffect, useMemo, useState } from "react";
 const KIOSK_WIDTH = 1080;
 const KIOSK_HEIGHT = 1920;
 
-const products = [
-  { id: "whiskey", category: "Whiskey", name: "Blanton’s Single Barrel", image: "/products/blantons.jpg" },
-  { id: "tequila", category: "Tequila", name: "Clase Azul Reposado", image: "/products/clase-azul.jpg" },
-  { id: "vodka", category: "Vodka", name: "Tito’s Handmade Vodka", image: "/products/titos.jpg" },
-  { id: "rum", category: "Rum", name: "Mount Gay XO", image: "/products/mount-gay.jpg" },
-  { id: "wine", category: "Wine", name: "Caymus Cabernet", image: "/products/caymus.jpg" },
-  { id: "champagne", category: "Champagne", name: "Veuve Clicquot Brut", image: "/products/veuve.jpg" },
+type CategoryKey = "whiskey" | "tequila" | "vodka" | "gin" | "cognac" | "wine";
+type Screen = "splash" | "found" | "category" | "type" | "rating" | "thanks";
+type Choice = { name: string; product: string; image: string };
+type Category = Choice & { key: CategoryKey; types: Choice[] };
+
+const categories: Category[] = [
+  {
+    key: "whiskey",
+    name: "Whiskey",
+    product: "Colonel E.H. Taylor Small Batch",
+    image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/products/image_60f26343-17e8-417f-a450-c01c554f6f12.jpg?v=1673484451",
+    types: [
+      { name: "Bourbon", product: "Colonel E.H. Taylor Small Batch", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/products/image_60f26343-17e8-417f-a450-c01c554f6f12.jpg?v=1673484451" },
+      { name: "Scotch", product: "Macallan Aera Royal Black", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/products/image_9756218c-48ea-498c-a0ee-a39c0d432c87.jpg?v=1672101353" },
+      { name: "Irish Whiskey", product: "Redbreast 12 Year", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/products/image_581c83d0-4eea-415e-a9b6-5a6eeb3fb55e.jpg?v=1640587192" },
+      { name: "Japanese Whiskey", product: "Yamazaki 12 Year", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/products/image_1644c611-a25c-4b1e-bce8-61fe4bbf613d.jpg?v=1660608977" },
+      { name: "Rye", product: "High West Midwinter Night’s Dram", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/products/image_64f3094d-f472-40ae-8a52-19de20a1e31c.jpg?v=1638000696" },
+      { name: "Canadian Whisky", product: "Caribou Crossing Single Barrel", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/files/FullSizeRender_99fec0d0-abfc-4198-9b1d-50236cb64d51.jpg?v=1780249967" },
+    ],
+  },
+  {
+    key: "tequila",
+    name: "Tequila",
+    product: "Clase Azul Reposado",
+    image: "/products/clase-azul.jpg",
+    types: [
+      { name: "Blanco & Silver", product: "Clase Azul Plata", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/products/IMG_3839.jpg?v=1623911764" },
+      { name: "Reposado", product: "Clase Azul Reposado", image: "/products/clase-azul.jpg" },
+      { name: "Añejo", product: "Clase Azul Añejo", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/files/FullSizeRender_76448043-ccd7-4d41-882d-0e75b17922d1.jpg?v=1769135970" },
+      { name: "Mezcal", product: "Del Maguey Chichicapa", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/products/Del-Maguey-Chichicapa-Mezcal.jpg?v=1621824892" },
+      { name: "Joven", product: "Casa Dragones Joven", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/products/image_98cba680-27db-4255-9e98-5a4ea339cba2.jpg?v=1657467878" },
+      { name: "Flavored Tequila", product: "MangoShotta Jalapeño", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/files/FullSizeRender_2e39b507-acc5-4f2c-96dd-52724a6707ac.jpg?v=1759188969" },
+    ],
+  },
+  {
+    key: "vodka",
+    name: "Vodka",
+    product: "Tito’s Handmade Vodka",
+    image: "/products/titos.jpg",
+    types: [
+      { name: "American Vodka", product: "Tito’s Vodka 1.75 Liter", image: "/products/titos.jpg" },
+      { name: "French Vodka", product: "Grey Goose Vodka", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/products/image_a2475255-11f4-4b22-af75-4bfa48f7ddc9.jpg?v=1647327377" },
+      { name: "Flavored Vodka", product: "Cîroc Passion Vodka", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/files/FullSizeRender_45d2fcb5-efba-4971-9ee2-4da414919e38.jpg?v=1695423872" },
+      { name: "Classic Vodka", product: "Tito’s Vodka 1 Liter", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/files/FullSizeRender_4dff3544-1449-4390-b29b-3a748da251ae.jpg?v=1696378638" },
+      { name: "Miniatures", product: "Tito’s Vodka 50ml Pack", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/files/FullSizeRender_23eb4d93-bd17-480b-83b4-232e9b092c1c.jpg?v=1696379224" },
+      { name: "Large Format", product: "Tito’s Vodka 1.75 Liter", image: "/products/titos.jpg" },
+    ],
+  },
+  {
+    key: "gin",
+    name: "Gin",
+    product: "Monkey 47 Schwarzwald Dry Gin",
+    image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/products/image_7976bbfc-0ae0-4895-85aa-04227056e9b3.jpg?v=1677811225",
+    types: [
+      { name: "Dry Gin", product: "Monkey 47 Schwarzwald Dry Gin", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/products/image_7976bbfc-0ae0-4895-85aa-04227056e9b3.jpg?v=1677811225" },
+      { name: "London Dry", product: "Bombay Sapphire Gin", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/products/image_d953f2bb-64ab-4f54-be97-edde8570d787.jpg?v=1647328176" },
+      { name: "Mediterranean Gin", product: "Gin Mare Mediterranean Gin", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/files/FullSizeRender_d6cb3465-e549-4304-9d7d-1f5f859eeb82.jpg?v=1696033460" },
+      { name: "Floral Gin", product: "Hendrick’s Flora Adora", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/products/image_52e5b441-ef3c-41ba-bf70-e9aa63316cd9.jpg?v=1678491393" },
+      { name: "Botanical Gin", product: "Hendrick’s Gin", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/products/Hendrick_E2_80_99s-Gin.png?v=1621824328" },
+      { name: "Large Format", product: "Monkey 47 Dry Gin 1L", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/products/image_8e6f385c-3174-4570-8dd7-475bc6da50bd.jpg?v=1640588276" },
+    ],
+  },
+  {
+    key: "cognac",
+    name: "Cognac",
+    product: "Hennessy White Cognac",
+    image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/files/FullSizeRender_7d4b370b-7f5c-431e-914c-038345b846f5.jpg?v=1704345865",
+    types: [
+      { name: "White Cognac", product: "Hennessy White Cognac", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/files/FullSizeRender_7d4b370b-7f5c-431e-914c-038345b846f5.jpg?v=1704345865" },
+      { name: "V.S.", product: "Hennessy V.S. Cognac", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/products/image_0d696f56-0980-4e6f-876f-f05f2491b130.jpg?v=1676426115" },
+      { name: "V.S.O.P.", product: "Hennessy V.S.O.P.", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/files/FullSizeRender_4cf38c2b-d309-4c40-b447-ff52c566186f.jpg?v=1779166110" },
+      { name: "Accord Royal", product: "Rémy Martin 1738", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/products/REMY-MARTIN-1738-ACCORD-ROYAL.jpg?v=1621823747" },
+      { name: "X.O.", product: "Premium X.O. Cognac", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/products/image_0d696f56-0980-4e6f-876f-f05f2491b130.jpg?v=1676426115" },
+      { name: "Brandy", product: "French Brandy Selection", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/products/REMY-MARTIN-1738-ACCORD-ROYAL.jpg?v=1621823747" },
+    ],
+  },
+  {
+    key: "wine",
+    name: "Wine",
+    product: "Caymus Napa Valley Cabernet",
+    image: "/products/caymus.jpg",
+    types: [
+      { name: "Cabernet Sauvignon", product: "Caymus Napa Valley Cabernet", image: "/products/caymus.jpg" },
+      { name: "Chardonnay", product: "Meiomi Chardonnay", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/files/FullSizeRender_20fda68f-ba83-4a0f-822d-d0909ecbeae7.jpg?v=1696289904" },
+      { name: "Merlot", product: "Barefoot Merlot", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/products/BUY-BAREFOOT-MERLOT.jpg?v=1621824207" },
+      { name: "Red Blend", product: "The Prisoner Red Blend", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/products/image_90451ab8-1f82-4e3c-96ae-4626ff1be442.jpg?v=1665714639" },
+      { name: "Malbec", product: "Dulzura Estate Malbec", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/products/Dulzura-Vineyard-2016-Estate-Malbec.jpg?v=1621824829" },
+      { name: "Rosé", product: "Veuve Clicquot Rosé", image: "https://cdn.shopify.com/s/files/1/0564/8737/9108/products/IMG_4012.jpg?v=1624580371" },
+    ],
+  },
 ];
 
-type Screen = "age" | "welcome" | "found" | "missing" | "rating" | "thanks";
-
-function Mark() {
+function Brand() {
   return (
-    <div className="mark" aria-label="Store name placeholder">
-      <span className="mark-kicker">EST. 2026</span>
+    <div className="brand">
+      <span>EST. 2026</span>
       <strong>YOUR STORE</strong>
-      <span className="mark-rule"><i /></span>
+      <i />
       <em>Fine Wines &amp; Spirits</em>
     </div>
   );
 }
 
-function Progress({ step }: { step: number }) {
+function Progress({ current, total }: { current: number; total: number }) {
   return (
-    <div className="progress" aria-label={`Question ${step} of 3`}>
-      {[1, 2, 3].map((item) => <span key={item} className={item <= step ? "active" : ""} />)}
-      <small>{String(step).padStart(2, "0")} / 03</small>
+    <div className="progress">
+      <span>QUESTION {String(current).padStart(2, "0")}</span>
+      <div>{Array.from({ length: total }, (_, index) => <i key={index} className={index < current ? "active" : ""} />)}</div>
+      <small>{current} / {total}</small>
     </div>
   );
 }
 
 export default function App() {
-  const [screen, setScreen] = useState<Screen>("age");
+  const [screen, setScreen] = useState<Screen>("splash");
   const [scale, setScale] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const [foundEverything, setFoundEverything] = useState<boolean | null>(null);
-  const [missing, setMissing] = useState<string[]>([]);
-  const [other, setOther] = useState("");
+  const [found, setFound] = useState<boolean | null>(null);
+  const [categoryKey, setCategoryKey] = useState<CategoryKey | null>(null);
+  const [typeName, setTypeName] = useState<string | null>(null);
   const [rating, setRating] = useState<number | null>(null);
 
   useEffect(() => {
     const resize = () => {
-      const nextScale = Math.min(window.innerWidth / KIOSK_WIDTH, window.innerHeight / KIOSK_HEIGHT);
-      setScale(nextScale);
-      setOffset({
-        x: (window.innerWidth - KIOSK_WIDTH * nextScale) / 2,
-        y: (window.innerHeight - KIOSK_HEIGHT * nextScale) / 2,
-      });
+      const next = Math.min(window.innerWidth / KIOSK_WIDTH, window.innerHeight / KIOSK_HEIGHT);
+      setScale(next);
+      setOffset({ x: (window.innerWidth - KIOSK_WIDTH * next) / 2, y: (window.innerHeight - KIOSK_HEIGHT * next) / 2 });
     };
     resize();
     window.addEventListener("resize", resize);
     return () => window.removeEventListener("resize", resize);
   }, []);
 
-  const currentStep = useMemo(() => (
-    screen === "found" ? 1 : screen === "missing" ? 2 : screen === "rating" ? 3 : 0
-  ), [screen]);
+  const selectedCategory = useMemo(() => categories.find((item) => item.key === categoryKey), [categoryKey]);
+  const total = found === false ? 4 : 2;
+  const step = screen === "found" ? 1 : screen === "category" ? 2 : screen === "type" ? 3 : screen === "rating" ? total : 0;
 
   const reset = () => {
-    setFoundEverything(null);
-    setMissing([]);
-    setOther("");
+    setFound(null);
+    setCategoryKey(null);
+    setTypeName(null);
     setRating(null);
-    setScreen("welcome");
-  };
-
-  const toggleMissing = (id: string) => {
-    setMissing((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
+    setScreen("splash");
   };
 
   return (
     <main className="viewport">
-      <div
-        className="kiosk"
-        style={{
-          width: KIOSK_WIDTH,
-          height: KIOSK_HEIGHT,
-          transform: `scale(${scale})`,
-          transformOrigin: "top left",
-          top: offset.y,
-          left: offset.x,
-        }}
-      >
-        <div className="grain" />
-        <header className="topbar">
-          <Mark />
-          {currentStep > 0 && <Progress step={currentStep} />}
-        </header>
-
-        {screen === "age" && (
-          <section className="screen age-screen">
-            <div className="age-bottle">
-              <img src="/products/blantons.jpg" alt="" />
-            </div>
-            <div className="age-content">
-              <p className="eyebrow">Before we begin</p>
-              <h1>Are you of legal drinking age?</h1>
-              <p className="lede">You must be 21 or older to enter this experience.</p>
-              <div className="age-actions">
-                <button className="primary" onClick={() => setScreen("welcome")}>Yes, I’m 21+</button>
-                <button className="secondary" onClick={() => setScreen("age")}>No, exit</button>
-              </div>
-              <p className="fine-print">Please enjoy responsibly. This prototype does not sell alcohol or collect personal information.</p>
+      <div className="kiosk" style={{ width: KIOSK_WIDTH, height: KIOSK_HEIGHT, transform: `scale(${scale})`, transformOrigin: "top left", top: offset.y, left: offset.x }}>
+        {screen === "splash" ? (
+          <section className="splash">
+            <video src="/splash.mp4" autoPlay muted loop playsInline aria-label="Premium spirits introduction" />
+            <div className="splash-shade" />
+            <div className="splash-top"><Brand /><span className="age-mark">21+</span></div>
+            <div className="splash-copy">
+              <p>YOUR EXPERIENCE · YOUR SAY</p>
+              <h1>Help us<br />raise the bar.</h1>
+              <span>Tell us about today’s visit in under a minute.</span>
+              <button className="gold-button" onClick={() => setScreen("found")}>I’M 21+ · BEGIN SURVEY <b>→</b></button>
+              <small>By entering, you confirm you are of legal drinking age.</small>
             </div>
           </section>
-        )}
+        ) : (
+          <>
+            <header><Brand />{step > 0 && <Progress current={step} total={total} />}</header>
 
-        {screen === "welcome" && (
-          <section className="screen welcome-screen">
-            <div className="hero-copy">
-              <p className="eyebrow">A better pour starts with you</p>
-              <h1>Help us refine your store experience.</h1>
-              <p className="lede">Three quick questions. Less than one minute.</p>
-              <button className="primary start" onClick={() => setScreen("found")}>Begin survey <span>→</span></button>
-            </div>
-            <div className="bottle-stage" aria-hidden="true">
-              <span className="halo" />
-              <img className="hero-bottle bottle-one" src="/products/clase-azul.jpg" alt="" />
-              <img className="hero-bottle bottle-two" src="/products/blantons.jpg" alt="" />
-              <img className="hero-bottle bottle-three" src="/products/veuve.jpg" alt="" />
-              <p>CURATED FOR<br />THE CURIOUS</p>
-            </div>
-          </section>
-        )}
+            {screen === "found" && (
+              <section className="question">
+                <div className="question-copy">
+                  <p>LET’S START HERE</p>
+                  <h1>Did you find the item you were looking for today?</h1>
+                  <span>Your answer helps us understand where our selection can improve.</span>
+                </div>
+                <div className="answer-pair">
+                  <button className={found === true ? "answer active" : "answer"} onClick={() => setFound(true)}>
+                    <b>YES</b><strong>I found it</strong><span>Everything I came for was available.</span><i>→</i>
+                  </button>
+                  <button className={found === false ? "answer active" : "answer"} onClick={() => setFound(false)}>
+                    <b>NO</b><strong>I couldn’t find it</strong><span>Something I wanted was unavailable.</span><i>→</i>
+                  </button>
+                </div>
+                <Nav back={() => setScreen("splash")} next={() => setScreen(found ? "rating" : "category")} disabled={found === null} />
+              </section>
+            )}
 
-        {screen === "found" && (
-          <section className="screen question-screen">
-            <div className="question-heading">
-              <p className="eyebrow">Question one</p>
-              <h1>Did you find everything you were looking for today?</h1>
-            </div>
-            <div className="binary-grid">
-              <button
-                className={foundEverything === true ? "choice selected" : "choice"}
-                onClick={() => setFoundEverything(true)}
-              >
-                <span className="choice-number">01</span>
-                <strong>Yes, I found it</strong>
-                <small>Everything I needed was available.</small>
-              </button>
-              <button
-                className={foundEverything === false ? "choice selected" : "choice"}
-                onClick={() => setFoundEverything(false)}
-              >
-                <span className="choice-number">02</span>
-                <strong>Not quite</strong>
-                <small>I couldn’t find one or more items.</small>
-              </button>
-            </div>
-            <nav className="survey-nav">
-              <button className="text-button" onClick={() => setScreen("welcome")}>← Back</button>
-              <button className="primary" disabled={foundEverything === null} onClick={() => setScreen("missing")}>Continue →</button>
-            </nav>
-          </section>
-        )}
+            {screen === "category" && (
+              <section className="question catalog-question">
+                <div className="question-copy compact">
+                  <p>HELP US NARROW IT DOWN</p>
+                  <h1>What category were you looking for?</h1>
+                  <span>Choose the closest match.</span>
+                </div>
+                <div className="catalog-grid">
+                  {categories.map((category) => (
+                    <button key={category.key} className={categoryKey === category.key ? "catalog-card active" : "catalog-card"} onClick={() => { setCategoryKey(category.key); setTypeName(null); }}>
+                      <img src={category.image} alt={category.product} />
+                      <span className="card-shade" />
+                      <small>FEATURED · {category.product}</small>
+                      <strong>{category.name}</strong>
+                      <i>{categoryKey === category.key ? "✓" : "→"}</i>
+                    </button>
+                  ))}
+                </div>
+                <Nav back={() => setScreen("found")} next={() => setScreen("type")} disabled={!categoryKey} />
+              </section>
+            )}
 
-        {screen === "missing" && (
-          <section className="screen product-screen">
-            <div className="question-heading compact">
-              <p className="eyebrow">Question two</p>
-              <h1>{foundEverything ? "What brought you in today?" : "What were you unable to find?"}</h1>
-              <p className="lede">Select all that apply.</p>
-            </div>
-            <div className="product-grid">
-              {products.map((product) => (
-                <button
-                  key={product.id}
-                  className={missing.includes(product.id) ? "product-card selected" : "product-card"}
-                  onClick={() => toggleMissing(product.id)}
-                  aria-pressed={missing.includes(product.id)}
-                >
-                  <span className="check">{missing.includes(product.id) ? "✓" : "+"}</span>
-                  <span className="product-image"><img src={product.image} alt={product.name} /></span>
-                  <small>{product.category}</small>
-                  <strong>{product.name}</strong>
-                </button>
-              ))}
-            </div>
-            <label className="other-field">
-              <span>Something else?</span>
-              <input value={other} onChange={(event) => setOther(event.target.value)} placeholder="Tell us what you were looking for…" maxLength={80} />
-            </label>
-            <nav className="survey-nav">
-              <button className="text-button" onClick={() => setScreen("found")}>← Back</button>
-              <button className="primary" disabled={missing.length === 0 && other.trim() === ""} onClick={() => setScreen("rating")}>Continue →</button>
-            </nav>
-          </section>
-        )}
+            {screen === "type" && selectedCategory && (
+              <section className="question catalog-question">
+                <div className="question-copy compact">
+                  <p>{selectedCategory.name.toUpperCase()} · ONE MORE DETAIL</p>
+                  <h1>What kind of {selectedCategory.name.toLowerCase()}?</h1>
+                  <span>Select the type or example closest to what you wanted.</span>
+                </div>
+                <div className="catalog-grid">
+                  {selectedCategory.types.map((item) => (
+                    <button key={item.name} className={typeName === item.name ? "catalog-card active" : "catalog-card"} onClick={() => setTypeName(item.name)}>
+                      <img src={item.image} alt={item.product} />
+                      <span className="card-shade" />
+                      <small>EXAMPLE · {item.product}</small>
+                      <strong>{item.name}</strong>
+                      <i>{typeName === item.name ? "✓" : "→"}</i>
+                    </button>
+                  ))}
+                </div>
+                <Nav back={() => setScreen("category")} next={() => setScreen("rating")} disabled={!typeName} />
+              </section>
+            )}
 
-        {screen === "rating" && (
-          <section className="screen question-screen rating-screen">
-            <div className="question-heading">
-              <p className="eyebrow">Question three</p>
-              <h1>How would you rate your overall shopping experience?</h1>
-              <p className="lede">Tap the number that best reflects today’s visit.</p>
-            </div>
-            <div className="rating-grid">
-              {[1, 2, 3, 4, 5].map((value) => (
-                <button
-                  key={value}
-                  className={rating === value ? "rating selected" : "rating"}
-                  onClick={() => setRating(value)}
-                  aria-label={`${value} out of 5`}
-                >
-                  <span>{value}</span>
-                  <small>{value === 1 ? "Poor" : value === 5 ? "Excellent" : ""}</small>
-                </button>
-              ))}
-            </div>
-            <div className="rating-caption"><span>Needs attention</span><i /><span>Exceptional</span></div>
-            <nav className="survey-nav">
-              <button className="text-button" onClick={() => setScreen("missing")}>← Back</button>
-              <button className="primary" disabled={rating === null} onClick={() => setScreen("thanks")}>Submit feedback →</button>
-            </nav>
-          </section>
-        )}
+            {screen === "rating" && (
+              <section className="question rating-question">
+                <div className="question-copy">
+                  <p>FINAL QUESTION</p>
+                  <h1>How was your overall shopping experience?</h1>
+                  <span>Tap the rating that best reflects today’s visit.</span>
+                </div>
+                <div className="rating-grid">
+                  {[1, 2, 3, 4, 5].map((value) => (
+                    <button key={value} className={rating === value ? "rating active" : "rating"} onClick={() => setRating(value)}>
+                      <b>0{value}</b><span>{["Poor", "Fair", "Good", "Very good", "Excellent"][value - 1]}</span>
+                    </button>
+                  ))}
+                </div>
+                <Nav back={() => setScreen(found ? "found" : "type")} next={() => setScreen("thanks")} disabled={!rating} label="Submit feedback" />
+              </section>
+            )}
 
-        {screen === "thanks" && (
-          <section className="screen thanks-screen">
-            <div className="seal"><span>✓</span></div>
-            <p className="eyebrow">Feedback received</p>
-            <h1>Thank you for helping us raise the bar.</h1>
-            <p className="lede">Your input helps us stock smarter and create a better experience for every guest.</p>
-            <div className="thanks-rule"><i /></div>
-            <p className="signoff">Here’s to your next great find.</p>
-            <button className="secondary reset" onClick={reset}>Start another survey</button>
-          </section>
-        )}
+            {screen === "thanks" && (
+              <section className="thanks">
+                <span className="seal">✓</span>
+                <p>FEEDBACK RECEIVED</p>
+                <h1>Thank you for helping us stock smarter.</h1>
+                <div className="summary">
+                  <span>ITEM FOUND<strong>{found ? "Yes" : "No"}</strong></span>
+                  {!found && <span>REQUESTED<strong>{typeName} · {selectedCategory?.name}</strong></span>}
+                  <span>EXPERIENCE<strong>{rating} / 5</strong></span>
+                </div>
+                <button className="outline-button" onClick={reset}>START ANOTHER SURVEY</button>
+              </section>
+            )}
 
-        <footer>
-          <span>YOUR STORE · LOCATION PLACEHOLDER</span>
-          <span>PLEASE ENJOY RESPONSIBLY · 21+</span>
-        </footer>
+            <footer><span>YOUR STORE · LOCATION PLACEHOLDER</span><span>PLEASE ENJOY RESPONSIBLY · 21+</span></footer>
+          </>
+        )}
       </div>
     </main>
+  );
+}
+
+function Nav({ back, next, disabled, label = "Continue" }: { back: () => void; next: () => void; disabled: boolean; label?: string }) {
+  return (
+    <nav>
+      <button className="back-button" onClick={back}>← BACK</button>
+      <button className="gold-button" disabled={disabled} onClick={next}>{label.toUpperCase()} <b>→</b></button>
+    </nav>
   );
 }
