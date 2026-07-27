@@ -117,14 +117,29 @@ nav .gold-button { width: 340px; }
 .rating.active span { color: #3c2918; }
 .rating.active { transform: translateY(-5px); box-shadow: 0 18px 38px rgba(0,0,0,.34), 0 0 0 3px rgba(225,194,127,.2); }
 
+.email-question .question-copy { margin-top: 35px; }
+.email-question .question-copy h1 { max-width: 850px; font-size: 70px; }
+.email-card { width: 100%; margin-top: 70px; padding: 55px; border: 2px solid rgba(225,194,127,.42); color: #21170f; background: linear-gradient(145deg, #f4eddf, #d8c8ab); box-shadow: 0 20px 50px rgba(0,0,0,.3); }
+.email-card label { display: block; color: #6d461d; font-size: 12px; font-weight: 700; letter-spacing: .22em; }
+.email-card input { width: 100%; height: 105px; margin-top: 20px; padding: 0 28px; border: 2px solid rgba(105,66,25,.38); border-radius: 0; outline: 0; color: #21170f; background: rgba(255,255,255,.72); font-size: 28px; }
+.email-card input:focus { border-color: #8c5e27; box-shadow: 0 0 0 4px rgba(140,94,39,.12); }
+.email-card input::placeholder { color: #8b7b66; }
+.email-card p { margin: 18px 0 0; color: #695b49; font-size: 13px; line-height: 1.5; }
+.email-card .gold-button { width: 100%; margin-top: 38px; }
+.email-back { margin-top: auto; align-self: flex-start; }
+
 .thanks { position: absolute; inset: 220px 0 88px; padding: 120px 95px; text-align: center; display: flex; flex-direction: column; align-items: center; }
 .seal { width: 120px; height: 120px; display: grid; place-items: center; margin-bottom: 42px; border: 1px solid var(--gold); border-radius: 50%; color: var(--gold-light); font-size: 40px; }
-.thanks h1 { max-width: 830px; font-size: 84px; line-height: .92; }
-.summary { width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: 70px; background: rgba(201,163,93,.25); border: 1px solid rgba(201,163,93,.25); }
+.thanks h1 { max-width: 830px; font-size: 78px; line-height: .92; }
+.discount-code { width: 650px; margin-top: 48px; padding: 32px; border: 2px solid var(--gold-light); color: #21170f; background: linear-gradient(145deg, #f4eddf, #d8c8ab); box-shadow: 0 18px 45px rgba(0,0,0,.28); }
+.discount-code span { display: block; color: #765126; font-size: 10px; font-weight: 700; letter-spacing: .22em; }
+.discount-code strong { display: block; margin-top: 10px; font-family: var(--font-display); font-size: 50px; letter-spacing: .08em; }
+.discount-code small { display: block; margin-top: 7px; color: #695b49; font-size: 12px; }
+.summary { width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: 42px; background: rgba(201,163,93,.25); border: 1px solid rgba(201,163,93,.25); }
 .summary.summary-four { grid-template-columns: repeat(4, 1fr); }
 .summary span { min-height: 130px; padding: 31px 15px; color: #9e9282; background: #100d0a; font-size: 10px; letter-spacing: .18em; }
 .summary strong { display: block; margin-top: 17px; color: var(--cream); font-family: var(--font-display); font-size: 23px; line-height: 1.1; letter-spacing: 0; }
-.thanks .outline-button { width: 390px; margin-top: 65px; }
+.thanks .outline-button { width: 390px; margin-top: 40px; }
 
 footer { position: absolute; z-index: 6; left: 72px; right: 72px; bottom: 43px; display: flex; justify-content: space-between; color: #71675b; font-size: 9px; letter-spacing: .18em; }
 

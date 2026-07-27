@@ -9,7 +9,7 @@ const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const assetUrl = (url: string) => url.startsWith("/") ? `${basePath}${url}` : url;
 
 type CategoryKey = "whiskey" | "tequila" | "vodka" | "gin" | "cognac" | "wine";
-type Screen = "splash" | "found" | "category" | "type" | "products" | "rating" | "associate" | "associateRating" | "thanks";
+type Screen = "splash" | "found" | "category" | "type" | "products" | "rating" | "associate" | "associateRating" | "email" | "thanks";
 type Choice = { name: string; product: string; image: string };
 type Category = Choice & { key: CategoryKey; types: Choice[] };
 type CatalogProduct = { id: string; name: string; handle: string; type: string; tags: string[]; image: string; url: string };
@@ -126,6 +126,7 @@ export default function App() {
   const [rating, setRating] = useState<number | null>(null);
   const [associateHelped, setAssociateHelped] = useState<boolean | null>(null);
   const [associateRating, setAssociateRating] = useState<number | null>(null);
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
     const resize = () => {
@@ -156,6 +157,7 @@ export default function App() {
   const selectedProduct = useMemo(() => categoryProducts.find((product) => product.id === productId) ?? (
     categoryKey ? fullCatalog[categoryKey].find((product) => product.id === productId) : undefined
   ), [categoryKey, categoryProducts, productId]);
+  const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   const reset = () => {
     setFound(null);
     setCategoryKey(null);
@@ -166,6 +168,7 @@ export default function App() {
     setRating(null);
     setAssociateHelped(null);
     setAssociateRating(null);
+    setEmail("");
     setScreen("splash");
   };
 
@@ -178,7 +181,8 @@ export default function App() {
       rating: found ? "found" : "products",
       associate: "rating",
       associateRating: "associate",
-      thanks: associateHelped ? "associateRating" : "associate",
+      email: associateHelped ? "associateRating" : "associate",
+      thanks: "email",
     };
     if (screen !== "splash") setScreen(previous[screen]);
   };
@@ -344,7 +348,7 @@ export default function App() {
                 </div>
                 <Nav
                   back={() => setScreen("rating")}
-                  next={() => setScreen(associateHelped ? "associateRating" : "thanks")}
+                  next={() => setScreen(associateHelped ? "associateRating" : "email")}
                   disabled={associateHelped === null}
                   label={associateHelped ? "Rate associate" : "Submit feedback"}
                 />
@@ -365,15 +369,48 @@ export default function App() {
                     </button>
                   ))}
                 </div>
-                <Nav back={() => setScreen("associate")} next={() => setScreen("thanks")} disabled={!associateRating} label="Submit feedback" />
+                <Nav back={() => setScreen("associate")} next={() => setScreen("email")} disabled={!associateRating} label="Submit feedback" />
+              </section>
+            )}
+
+            {screen === "email" && (
+              <section className="question email-question">
+                <div className="question-copy">
+                  <p>YOUR 5% THANK-YOU OFFER</p>
+                  <h1>Where should we send your discount code?</h1>
+                  <span>Enter your email address to receive 5% off your next purchase.</span>
+                </div>
+                <form
+                  className="email-card"
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    if (validEmail) setScreen("thanks");
+                  }}
+                >
+                  <label htmlFor="discount-email">EMAIL ADDRESS</label>
+                  <input
+                    id="discount-email"
+                    type="email"
+                    inputMode="email"
+                    autoComplete="email"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    placeholder="you@example.com"
+                    aria-describedby="email-note"
+                  />
+                  <p id="email-note">Your email is used to deliver this offer. Prototype only—no email will actually be sent.</p>
+                  <button className="gold-button" type="submit" disabled={!validEmail}>GET MY 5% CODE <b>→</b></button>
+                </form>
+                <button className="back-button email-back" onClick={() => setScreen(associateHelped ? "associateRating" : "associate")}>← BACK</button>
               </section>
             )}
 
             {screen === "thanks" && (
               <section className="thanks">
                 <span className="seal">✓</span>
-                <p>FEEDBACK RECEIVED</p>
-                <h1>Thank you for helping us stock smarter.</h1>
+                <p>FEEDBACK RECEIVED · OFFER READY</p>
+                <h1>Your 5% discount code is ready.</h1>
+                <div className="discount-code"><span>YOUR CODE</span><strong>THANKYOU5</strong><small>Present this code on your next purchase.</small></div>
                 <div className={found ? "summary" : "summary summary-four"}>
                   <span>ITEM FOUND<strong>{found ? "Yes" : "No"}</strong></span>
                   {!found && <span>REQUESTED<strong>{selectedProduct?.name ?? `${typeName} · ${selectedCategory?.name}`}</strong></span>}
