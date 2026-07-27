@@ -85,13 +85,13 @@ header { height: 220px; padding: 58px 72px 0; display: flex; justify-content: sp
 .catalog-search > span { padding-left: 22px; color: var(--gold-light); font-size: 10px; font-weight: 700; letter-spacing: .2em; }
 .catalog-search input { height: 100%; min-width: 0; padding: 0 22px; border: 0; border-left: 1px solid rgba(201,163,93,.2); outline: 0; color: var(--cream); background: transparent; font-size: 16px; }
 .catalog-search input::placeholder { color: #746a5e; }
-.product-list { height: 940px; margin-top: 18px; padding-right: 8px; overflow-y: auto; overscroll-behavior: contain; scrollbar-color: var(--gold) rgba(255,255,255,.06); scrollbar-width: thin; }
+.product-list { flex: 1; min-height: 0; height: auto; margin-top: 18px; padding-right: 8px; overflow-y: auto; overscroll-behavior: contain; scrollbar-color: var(--gold) rgba(255,255,255,.06); scrollbar-width: thin; }
 .product-list-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-.product-tile { position: relative; min-height: 460px; padding: 14px 14px 25px; overflow: hidden; border: 1px solid rgba(201,163,93,.25); color: var(--cream); background: rgba(255,255,255,.035); text-align: left; cursor: pointer; }
+.product-tile { position: relative; min-height: 525px; padding: 14px 14px 25px; overflow: hidden; border: 1px solid rgba(201,163,93,.25); color: var(--cream); background: rgba(255,255,255,.035); text-align: left; cursor: pointer; }
 .product-tile::after { content: ""; position: absolute; inset: 7px; border: 1px solid transparent; pointer-events: none; }
 .product-tile.active { border-color: var(--gold-light); background: rgba(201,163,93,.12); }
 .product-tile.active::after { border-color: rgba(225,194,127,.42); }
-.product-photo { display: block; width: 100%; height: 350px; padding: 10px; margin-bottom: 18px; overflow: hidden; background: linear-gradient(145deg, #f1ede5, #d8d0c2); }
+.product-photo { display: block; width: 100%; height: 410px; padding: 10px; margin-bottom: 18px; overflow: hidden; background: linear-gradient(145deg, #f1ede5, #d8d0c2); }
 .product-photo img { width: 100%; height: 100%; object-fit: contain; object-position: center; mix-blend-mode: multiply; transform: scale(1.06); }
 .product-tile small { display: block; padding-right: 34px; overflow: hidden; color: var(--gold-light); font-size: 9px; letter-spacing: .13em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
 .product-tile strong { display: -webkit-box; margin-top: 8px; overflow: hidden; font-family: var(--font-display); font-size: 24px; line-height: 1.02; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
