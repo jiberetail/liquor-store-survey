@@ -187,7 +187,13 @@ export default function App() {
         {screen === "splash" ? (
           <section className="splash">
             <video src="/splash.mp4" autoPlay muted loop playsInline aria-label="Premium spirits introduction" />
-            <div className="blue-label-overlay" aria-hidden="true" />
+            <div className="bottle-replacement-backdrop" aria-hidden="true" />
+            <img
+              className="blue-label-bottle"
+              src="/products/johnnie-walker-blue-bottle-trimmed.png"
+              alt=""
+              aria-hidden="true"
+            />
             <div className="splash-shade" />
             <div className="splash-top"><Brand /><span className="age-mark">21+</span></div>
             <div className="splash-copy">
